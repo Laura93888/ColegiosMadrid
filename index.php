@@ -1,358 +1,319 @@
-<?php
-
-require_once "funciones.php";
-
-$url = "https://datos.madrid.es/egob/catalogo/202311-0-colegios-publicos.json";
-
-$resp = callApi($url);
-
-if($resp !== -1 && $resp !== -2){
-
-    // Convertimos el JSON en un array PHP
-    $json = json_decode($resp, true);
-
-    // Los colegios están dentro de @graph
-    $colegios = $json["@graph"];
-
-    // Variable para guardar la lista de colegios
-    $lista = "";
-
-    // Valor del buscador
-    $valorbuscar = "";
-
-    // Recorremos los colegios
-    foreach($colegios as $valor){
-
-        // Si se ha realizado una búsqueda
-        if(isset($_GET["valor"])){
-
-            $valorbuscar = $_GET["valor"];
-
-            // Comprobamos si el nombre contiene el texto buscado
-            if(str_contains(
-                strtolower($valor["title"]),
-                strtolower($valorbuscar)
-            )){
-
-                $lista .= "
-                    <a
-                        class='colegio'
-                        href='" . $_SERVER['PHP_SELF'] . "?id=" . $valor["id"] . "&valor=" . $valorbuscar . "'
-                    >
-                        " . $valor["title"] . "
-                    </a>
-                ";
-            }
-
-        }else{
-
-            // Si no hay búsqueda, mostramos todos los colegios
-            $lista .= "
-                <a
-                    class='colegio'
-                    href='" . $_SERVER['PHP_SELF'] . "?id=" . $valor["id"] . "'
-                >
-                    " . $valor["title"] . "
-                </a>
-            ";
-        }
-
-        // Si se ha seleccionado un colegio
-        if(isset($_GET["id"])){
-
-            if($valor["id"] == $_GET["id"]){
-
-                // Guardamos el colegio seleccionado
-                $elemento = $valor;
-
-                // Obtenemos sus coordenadas
-                $lat = $valor["location"]["latitude"];
-                $lon = $valor["location"]["longitude"];
-
-                // Creamos el enlace de Google Maps
-                $googleMaps = "https://www.google.com/maps?q=$lat,$lon";
-            }
-        }
-    }
-
-}else{
-
-    $error = "Ha habido un problema al conectar con la API.";
-
-}
-
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="description" content="Consulta información sobre los colegios públicos de Madrid.">
     <title>Madrid Colegios</title>
-
-    <!-- Bootstrap -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-
-    <!-- Nuestro CSS -->
     <link rel="stylesheet" href="styles.css">
-
 </head>
 
-
 <body>
-
     <main class="contenedor">
-
-        <!-- CABECERA -->
-
         <header class="cabecera">
-
-            <h1>Madrid Colegios</h1>
-
-            <p>
-                Consulta información sobre los colegios públicos de Madrid
-            </p>
-
+            <div>
+                <span class="eyebrow">Guía educativa de Madrid</span>
+                <h1>Madrid <span>Colegios</span></h1>
+                <p>Encuentra un colegio público y consulta sus datos principales.</p>
+            </div>
+            <div class="resumen" aria-label="Resumen de resultados">
+                <strong id="contador-total">—</strong>
+                <span>centros disponibles</span>
+            </div>
         </header>
 
-
-        <!-- BUSCADOR -->
-
-        <section class="buscador">
-
-            <form
-                action="<?= $_SERVER["PHP_SELF"] ?>"
-                method="get"
-            >
-
+        <section class="buscador" aria-label="Buscar colegios">
+            <div class="buscador-icono" aria-hidden="true">⌕</div>
+            <div class="buscador-campo">
+                <label for="buscar-colegio">Buscar colegio</label>
                 <input
-                    type="text"
-                    name="valor"
-                    value="<?= $valorbuscar ?>"
-                    placeholder="Buscar colegio..."
+                    id="buscar-colegio"
+                    type="search"
+                    placeholder="Escribe el nombre del colegio..."
+                    autocomplete="off"
+                    spellcheck="false"
                 >
-
-                <button
-                    name="buscar"
-                    type="submit"
-                    value="buscar"
-                >
-                    Buscar
-                </button>
-
-            </form>
-
+            </div>
+            <span id="estado-busqueda" class="estado-busqueda">Escribe para filtrar</span>
         </section>
 
-
-        <!-- MENSAJE DE ERROR -->
-
-        <?php if(isset($error)){ ?>
-
-            <div class="mensaje-error">
-
-                <?= $error ?>
-
-            </div>
-
-        <?php } ?>
-
-
-        <!-- APLICACIÓN -->
-
-        <section class="aplicacion">
-
-
-            <!-- LISTA DE COLEGIOS -->
-
-            <div class="panel-lista">
-
+        <section class="aplicacion" id="aplicacion">
+            <aside class="panel-lista" id="panel-lista" aria-label="Lista de colegios">
                 <div class="cabecera-lista">
-
-                    <h2>Colegios</h2>
-
-                    <?php if($valorbuscar != ""){ ?>
-
-                        <p>
-                            Resultados para:
-                            <strong><?= $valorbuscar ?></strong>
-                        </p>
-
-                    <?php } else { ?>
-
-                        <p>
-                            Selecciona un colegio de la lista
-                        </p>
-
-                    <?php } ?>
-
+                    <div>
+                        <span class="seccion-kicker">Directorio</span>
+                        <h2>Colegios públicos</h2>
+                    </div>
+                    <span class="contador-lista" id="contador-lista">—</span>
                 </div>
 
-
-                <div class="lista-colegios">
-
-                    <?= $lista ?>
-
+                <div id="estado-lista" class="estado-lista estado-cargando" aria-live="polite">
+                    <div class="skeleton skeleton-titulo"></div>
+                    <div class="skeleton"></div>
+                    <div class="skeleton"></div>
+                    <div class="skeleton"></div>
+                    <span>Cargando colegios...</span>
                 </div>
-
-            </div>
-
-
-            <!-- INFORMACIÓN DEL COLEGIO -->
-
-            <div class="panel-detalle">
-
-
-                <?php if(isset($_GET["id"]) && isset($elemento)){ ?>
-
-
-                    <span class="etiqueta">
-                        Información del colegio
-                    </span>
-
-
-                    <h2>
-                        <?= $elemento["title"] ?>
-                    </h2>
-
-
-                    <!-- LOCALIDAD -->
-
-                    <div class="dato">
-
-                        <span>📍</span>
-
-                        <div>
-
-                            <strong>Localidad</strong>
-
-                            <p>
-                                <?= $elemento["address"]["locality"] ?>
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- CÓDIGO POSTAL -->
-
-                    <div class="dato">
-
-                        <span>📮</span>
-
-                        <div>
-
-                            <strong>Código postal</strong>
-
-                            <p>
-                                <?= $elemento["address"]["postal-code"] ?>
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- DIRECCIÓN -->
-
-                    <div class="dato">
-
-                        <span>🏫</span>
-
-                        <div>
-
-                            <strong>Dirección</strong>
-
-                            <p>
-                                <?= $elemento["address"]["street-address"] ?>
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- GOOGLE MAPS -->
-
-                    <a
-                        class="boton-mapa"
-                        href="<?= $googleMaps ?>"
-                        target="_blank"
-                    >
-                        🗺️ Ver en Google Maps
-                    </a>
-
-
-                    <!-- DESCRIPCIÓN -->
-
-                    <div class="descripcion">
-
-                        <h3>
-                            Descripción
-                        </h3>
-
-                        <p>
-                            <?= $elemento["organization"]["organization-desc"] ?>
-                        </p>
-
-                    </div>
-
-
-                    <!-- SERVICIOS -->
-
-                    <div class="descripcion">
-
-                        <h3>
-                            Servicios
-                        </h3>
-
-                        <p>
-                            <?= $elemento["organization"]["services"] ?>
-                        </p>
-
-                    </div>
-
-
-                <?php } else { ?>
-
-
-                    <!-- ESTADO INICIAL -->
-
-                    <div class="sin-seleccionar">
-
-                        <div class="icono-vacio">
-                            🏫
-                        </div>
-
-                        <h2>
-                            Selecciona un colegio
-                        </h2>
-
-                        <p>
-                            Elige un colegio de la lista para consultar
-                            su información.
-                        </p>
-
-                    </div>
-
-
-                <?php } ?>
-
-
-            </div>
-
+                <div class="lista-colegios" id="lista-colegios" hidden></div>
+            </aside>
+
+            <section class="panel-detalle" id="panel-detalle" aria-live="polite" tabindex="-1">
+                <button class="boton-volver" id="boton-volver" type="button">
+                    <span aria-hidden="true">←</span> Volver a la lista
+                </button>
+                <div class="sin-seleccionar" id="detalle-vacio">
+                    <div class="icono-vacio" aria-hidden="true">🏫</div>
+                    <span class="detalle-kicker">Consulta un centro</span>
+                    <h2>Selecciona un colegio</h2>
+                    <p>Elige un colegio de la lista para consultar su dirección, descripción y ubicación.</p>
+                </div>
+                <div id="detalle-contenido" hidden></div>
+            </section>
         </section>
-
     </main>
 
+    <script>
+        (() => {
+            const state = {
+                colegios: [],
+                filtrados: [],
+                seleccionado: null,
+                timerBusqueda: null
+            };
+
+            const aplicacion = document.querySelector("#aplicacion");
+            const inputBusqueda = document.querySelector("#buscar-colegio");
+            const lista = document.querySelector("#lista-colegios");
+            const estadoLista = document.querySelector("#estado-lista");
+            const estadoBusqueda = document.querySelector("#estado-busqueda");
+            const detalleVacio = document.querySelector("#detalle-vacio");
+            const detalleContenido = document.querySelector("#detalle-contenido");
+            const panelDetalle = document.querySelector("#panel-detalle");
+            const botonVolver = document.querySelector("#boton-volver");
+            const contadorTotal = document.querySelector("#contador-total");
+            const contadorLista = document.querySelector("#contador-lista");
+
+            const escapeHtml = (value) => String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+            const texto = (value, fallback = "No disponible") => {
+                const result = String(value ?? "").trim();
+                return result || fallback;
+            };
+
+            const nombreColegio = (colegio) => texto(colegio.title, "Colegio sin nombre");
+
+            const obtenerCoordenadas = (colegio) => {
+                const latitud = Number(colegio?.location?.latitude);
+                const longitud = Number(colegio?.location?.longitude);
+
+                if (!Number.isFinite(latitud) || !Number.isFinite(longitud)) {
+                    return null;
+                }
+
+                return { latitud, longitud };
+            };
+
+            const mostrarEstado = (tipo, mensaje) => {
+                estadoLista.className = `estado-lista estado-${tipo}`;
+                estadoLista.innerHTML = `<span>${escapeHtml(mensaje)}</span>`;
+                estadoLista.hidden = false;
+                lista.hidden = true;
+            };
+
+            const mostrarLista = () => {
+                if (state.filtrados.length === 0) {
+                    mostrarEstado(
+                        "vacio",
+                        inputBusqueda.value.trim()
+                            ? "No encontramos colegios con esa búsqueda."
+                            : "No hay colegios disponibles."
+                    );
+                    contadorLista.textContent = "0";
+                    return;
+                }
+
+                estadoLista.hidden = true;
+                lista.hidden = false;
+                contadorLista.textContent = state.filtrados.length;
+                lista.innerHTML = state.filtrados.map((colegio) => {
+                    const id = escapeHtml(colegio.id);
+                    const activo = String(colegio.id) === String(state.seleccionado?.id);
+
+                    return `
+                        <button
+                            class="colegio ${activo ? "activo" : ""}"
+                            type="button"
+                            data-id="${id}"
+                            aria-pressed="${activo}"
+                        >
+                            <span class="colegio-punto" aria-hidden="true"></span>
+                            <span class="colegio-nombre">${escapeHtml(nombreColegio(colegio))}</span>
+                            <span class="colegio-flecha" aria-hidden="true">›</span>
+                        </button>
+                    `;
+                }).join("");
+            };
+
+            const renderDetalle = (colegio) => {
+                if (!colegio) {
+                    state.seleccionado = null;
+                    detalleContenido.hidden = true;
+                    detalleVacio.hidden = false;
+                    return;
+                }
+
+                const coordenadas = obtenerCoordenadas(colegio);
+                const titulo = nombreColegio(colegio);
+                const localidad = texto(colegio?.address?.locality);
+                const codigoPostal = texto(colegio?.address?.["postal-code"]);
+                const direccion = texto(colegio?.address?.["street-address"]);
+                const descripcion = texto(colegio?.organization?.["organization-desc"]);
+                const servicios = texto(colegio?.organization?.services);
+                const googleMaps = coordenadas
+                    ? `https://www.google.com/maps?q=${coordenadas.latitud},${coordenadas.longitud}`
+                    : null;
+                const mapa = coordenadas
+                    ? `
+                        <div class="mapa-contenedor">
+                            <div class="subseccion-cabecera">
+                                <div>
+                                    <span class="seccion-kicker">Ubicación</span>
+                                    <h3>Cómo llegar</h3>
+                                </div>
+                                <span class="coordenadas">${coordenadas.latitud.toFixed(4)}, ${coordenadas.longitud.toFixed(4)}</span>
+                            </div>
+                            <iframe
+                                class="mapa"
+                                title="Mapa de ${escapeHtml(titulo)}"
+                                src="https://www.google.com/maps?q=${coordenadas.latitud},${coordenadas.longitud}&z=15&output=embed"
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                            ></iframe>
+                        </div>
+                    `
+                    : "";
+
+                state.seleccionado = colegio;
+                detalleVacio.hidden = true;
+                detalleContenido.hidden = false;
+                detalleContenido.innerHTML = `
+                    <div class="detalle-encabezado">
+                        <span class="etiqueta">Colegio público</span>
+                        <h2>${escapeHtml(titulo)}</h2>
+                        <p class="detalle-id">Información actualizada desde el catálogo de datos de Madrid</p>
+                    </div>
+
+                    <div class="datos-grid">
+                        <div class="dato">
+                            <span class="dato-icono" aria-hidden="true">⌖</span>
+                            <div><strong>Localidad</strong><p>${escapeHtml(localidad)}</p></div>
+                        </div>
+                        <div class="dato">
+                            <span class="dato-icono" aria-hidden="true">#</span>
+                            <div><strong>Código postal</strong><p>${escapeHtml(codigoPostal)}</p></div>
+                        </div>
+                        <div class="dato dato-ancho">
+                            <span class="dato-icono" aria-hidden="true">⌂</span>
+                            <div><strong>Dirección</strong><p>${escapeHtml(direccion)}</p></div>
+                        </div>
+                    </div>
+
+                    <div class="detalle-acciones">
+                        ${googleMaps ? `<a class="boton-mapa" href="${googleMaps}" target="_blank" rel="noopener noreferrer">Abrir en Google Maps <span aria-hidden="true">↗</span></a>` : ""}
+                    </div>
+
+                    <div class="descripcion">
+                        <span class="seccion-kicker">Sobre el centro</span>
+                        <h3>Descripción</h3>
+                        <p>${escapeHtml(descripcion)}</p>
+                    </div>
+
+                    <div class="descripcion">
+                        <span class="seccion-kicker">Información adicional</span>
+                        <h3>Servicios</h3>
+                        <p>${escapeHtml(servicios)}</p>
+                    </div>
+
+                    ${mapa}
+                `;
+            };
+
+            const seleccionarColegio = (id) => {
+                const colegio = state.colegios.find((item) => String(item.id) === String(id));
+                if (!colegio) return;
+
+                renderDetalle(colegio);
+                mostrarLista();
+                aplicacion.classList.add("detalle-visible");
+                panelDetalle.focus({ preventScroll: true });
+                panelDetalle.scrollIntoView({ behavior: "smooth", block: "start" });
+            };
+
+            const filtrar = () => {
+                const consulta = inputBusqueda.value.trim().toLocaleLowerCase("es");
+
+                state.filtrados = state.colegios.filter((colegio) => {
+                    const nombre = nombreColegio(colegio).toLocaleLowerCase("es");
+                    const localidad = texto(colegio?.address?.locality, "").toLocaleLowerCase("es");
+                    return !consulta || nombre.includes(consulta) || localidad.includes(consulta);
+                });
+
+                estadoBusqueda.textContent = consulta
+                    ? `${state.filtrados.length} resultado${state.filtrados.length === 1 ? "" : "s"}`
+                    : "Escribe para filtrar";
+                mostrarLista();
+            };
+
+            const cargarColegios = async () => {
+                mostrarEstado("cargando", "Cargando colegios...");
+
+                try {
+                    const respuesta = await fetch("api.php", {
+                        headers: { "Accept": "application/json" }
+                    });
+                    const datos = await respuesta.json();
+
+                    if (!respuesta.ok || !Array.isArray(datos.colegios)) {
+                        throw new Error(datos.error || "La respuesta no es válida.");
+                    }
+
+                    state.colegios = datos.colegios;
+                    state.filtrados = datos.colegios;
+                    contadorTotal.textContent = datos.colegios.length;
+                    filtrar();
+                } catch (error) {
+                    contadorTotal.textContent = "—";
+                    contadorLista.textContent = "0";
+                    mostrarEstado("error", error.message || "No se han podido cargar los colegios.");
+                }
+            };
+
+            inputBusqueda.addEventListener("input", () => {
+                estadoBusqueda.textContent = "Buscando...";
+                window.clearTimeout(state.timerBusqueda);
+                state.timerBusqueda = window.setTimeout(filtrar, 300);
+            });
+
+            lista.addEventListener("click", (event) => {
+                const boton = event.target.closest("[data-id]");
+                if (boton) seleccionarColegio(boton.dataset.id);
+            });
+
+            botonVolver.addEventListener("click", () => {
+                aplicacion.classList.remove("detalle-visible");
+                inputBusqueda.focus();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+
+            cargarColegios();
+        })();
+    </script>
 </body>
 
 </html>
