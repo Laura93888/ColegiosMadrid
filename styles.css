@@ -1,0 +1,349 @@
+/* ------------------------------
+   ESTILOS GENERALES
+------------------------------ */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f1eb;
+    color: #263238;
+}
+
+.contenedor {
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+
+/* ------------------------------
+   CABECERA
+------------------------------ */
+
+.cabecera {
+    margin-bottom: 25px;
+}
+
+.cabecera h1 {
+    margin: 0 0 8px 0;
+    color: #234b68;
+    font-size: 36px;
+}
+
+.cabecera p {
+    margin: 0;
+    color: #68757d;
+    font-size: 16px;
+}
+
+
+/* ------------------------------
+   BUSCADOR
+------------------------------ */
+
+.buscador {
+    background-color: white;
+    padding: 18px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.buscador form {
+    display: flex;
+    gap: 10px;
+}
+
+.buscador input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1px solid #ccd5da;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.buscador input:focus {
+    outline: none;
+    border-color: #39749b;
+}
+
+.buscador button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    background-color: #39749b;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.buscador button:hover {
+    background-color: #2d5f80;
+}
+
+
+/* ------------------------------
+   ERROR
+------------------------------ */
+
+.mensaje-error {
+    background-color: #f8d7da;
+    color: #842029;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+
+/* ------------------------------
+   APLICACIÓN
+------------------------------ */
+
+.aplicacion {
+    display: grid;
+    grid-template-columns: 40% 60%;
+    min-height: 600px;
+    background-color: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ------------------------------
+   LISTA DE COLEGIOS
+------------------------------ */
+
+.panel-lista {
+    border-right: 1px solid #e1e5e7;
+    background-color: #fafafa;
+    display: flex;
+    flex-direction: column;
+}
+
+.cabecera-lista {
+    padding: 22px;
+    border-bottom: 1px solid #e1e5e7;
+}
+
+.cabecera-lista h2 {
+    margin: 0 0 6px 0;
+    color: #234b68;
+    font-size: 22px;
+}
+
+.cabecera-lista p {
+    margin: 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.lista-colegios {
+    overflow-y: auto;
+    max-height: 520px;
+}
+
+
+/* Cada colegio de la lista */
+
+.colegio {
+    display: block;
+    padding: 13px 20px;
+    border-bottom: 1px solid #e8ebed;
+    text-decoration: none;
+    color: #354b58;
+    font-size: 14px;
+    line-height: 1.4;
+    transition: background-color 0.2s, padding-left 0.2s;
+}
+
+.colegio:hover {
+    background-color: #e8f1f6;
+    color: #234b68;
+    padding-left: 25px;
+}
+
+
+/* ------------------------------
+   PANEL DE DETALLE
+------------------------------ */
+
+.panel-detalle {
+    padding: 40px;
+    background-color: white;
+}
+
+.panel-detalle h2 {
+    margin: 8px 0 30px 0;
+    color: #234b68;
+    font-size: 28px;
+    line-height: 1.2;
+}
+
+.etiqueta {
+    display: inline-block;
+    background-color: #e8f1f6;
+    color: #39749b;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+
+/* ------------------------------
+   DATOS DEL COLEGIO
+------------------------------ */
+
+.dato {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.dato > span {
+    font-size: 22px;
+    width: 30px;
+}
+
+.dato strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #59666d;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.dato p {
+    margin: 0;
+    color: #263238;
+    line-height: 1.5;
+}
+
+
+/* ------------------------------
+   BOTÓN GOOGLE MAPS
+------------------------------ */
+
+.boton-mapa {
+    display: inline-block;
+    margin: 5px 0 30px 45px;
+    padding: 11px 18px;
+    background-color: #7b3945;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.boton-mapa:hover {
+    background-color: #632d38;
+}
+
+
+/* ------------------------------
+   DESCRIPCIÓN
+------------------------------ */
+
+.descripcion {
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid #e1e5e7;
+}
+
+.descripcion h3 {
+    margin: 0 0 10px 0;
+    color: #234b68;
+    font-size: 18px;
+}
+
+.descripcion p {
+    margin: 0;
+    color: #59666d;
+    line-height: 1.6;
+}
+
+
+/* ------------------------------
+   SIN COLEGIO SELECCIONADO
+------------------------------ */
+
+.sin-seleccionar {
+    height: 100%;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #7b858a;
+    padding: 30px;
+}
+
+.icono-vacio {
+    font-size: 55px;
+    margin-bottom: 15px;
+}
+
+.sin-seleccionar h2 {
+    margin: 0 0 10px 0;
+    color: #52636c;
+    font-size: 24px;
+}
+
+.sin-seleccionar p {
+    max-width: 350px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+
+/* ------------------------------
+   RESPONSIVE
+------------------------------ */
+
+@media (max-width: 800px) {
+
+    .contenedor {
+        width: 94%;
+        margin: 25px auto;
+    }
+
+    .cabecera h1 {
+        font-size: 30px;
+    }
+
+    .aplicacion {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-lista {
+        border-right: none;
+        border-bottom: 1px solid #e1e5e7;
+    }
+
+    .lista-colegios {
+        max-height: 300px;
+    }
+
+    .panel-detalle {
+        padding: 25px;
+    }
+
+    .panel-detalle h2 {
+        font-size: 24px;
+    }
+
+    .buscador form {
+        flex-direction: column;
+    }
+
+    .buscador button {
+        width: 100%;
+    }
+}

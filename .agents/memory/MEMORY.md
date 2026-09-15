@@ -1,0 +1,1 @@
+- [Preview PHP en Replit](php-preview-workflow.md) — las apps PHP necesitan un workflow webview en 5000 y el reemplazo validado de `.replit` puede recrear/eliminar workflows.
