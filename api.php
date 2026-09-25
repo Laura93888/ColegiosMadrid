@@ -4,9 +4,11 @@ require_once "funciones.php";
 
 header("Content-Type: application/json; charset=UTF-8");
 
+//URL DE LA API
 $url = "https://datos.madrid.es/egob/catalogo/202311-0-colegios-publicos.json";
 $resp = callApi($url);
 
+//RECOGEMOS LOS ERRORES
 if($resp === -1 || $resp === -2){
     http_response_code(502);
 
@@ -29,6 +31,7 @@ if(!is_array($json) || !isset($json["@graph"]) || !is_array($json["@graph"])){
     exit;
 }
 
+//SACAMOS LA LISTA DE COLEGIOS
 $colegios = decodeHtmlEntitiesRecursive($json["@graph"]);
 
 echo json_encode([

@@ -1,5 +1,6 @@
 <?php
 
+//LLAMAMOS A LA API PARA OBETENER LOS DATOS
 function callApi($url){
 
     // Inicializamos cURL con la URL de la petición
@@ -47,6 +48,7 @@ function callApi($url){
         return -2;
     }
 }
+
 
 /**
  * Decodifica entidades HTML en todos los textos de una respuesta de la API.

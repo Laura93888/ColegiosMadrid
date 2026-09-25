@@ -81,7 +81,8 @@
                 seleccionado: null,
                 timerBusqueda: null
             };
-
+            //NECESITAMOS TODOS ESTOS DATOS PARA MOSTRARLOS Y USARLOS
+            
             const aplicacion = document.querySelector("#aplicacion");
             const inputBusqueda = document.querySelector("#buscar-colegio");
             const lista = document.querySelector("#lista-colegios");
