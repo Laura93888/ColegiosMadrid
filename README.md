@@ -4,8 +4,6 @@ Aplicación web desarrollada con **PHP** que permite consultar información sobr
 
 El proyecto está enfocado en el consumo de APIs, el tratamiento de datos en formato **JSON** y la generación dinámica de contenido con PHP.
 
----
-
 ## 📌 Funcionalidades
 
 * Consulta de colegios públicos de Madrid mediante una API.
@@ -20,7 +18,6 @@ El proyecto está enfocado en el consumo de APIs, el tratamiento de datos en for
 * Gestión básica de errores durante la conexión con la API.
 * Diseño responsive para diferentes tamaños de pantalla.
 
----
 
 ## 🛠️ Tecnologías utilizadas
 
@@ -32,7 +29,6 @@ El proyecto está enfocado en el consumo de APIs, el tratamiento de datos en for
 * **Bootstrap**
 * **GET** para realizar búsquedas y seleccionar colegios.
 
----
 
 ## 🔄 Trabajo con API y JSON
 
@@ -59,7 +55,6 @@ $valor["location"]["longitude"]
 
 Esto permite utilizar diferentes partes de la información proporcionada por la API para construir la interfaz.
 
----
 
 ## 🔎 Búsqueda y filtrado
 
@@ -79,7 +74,6 @@ De esta forma, se muestran únicamente los colegios cuyo nombre contiene el text
 
 Si no se encuentra ningún resultado, la aplicación muestra un mensaje informativo al usuario.
 
----
 
 ## 📍 Localización
 
